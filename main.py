@@ -53,8 +53,9 @@ class Distro_Watch:
             print('\nStopped!')
 
     def show_ranks(self, span_value, span_name, dataspan_link):
+        import pandas as pd
         with open(f"{span_name}.csv", 'w', encoding='utf-8') as f:
-            headers = ['Rank', 'Distribution', 'Rating']
+            headers = ['Rank', 'Distribution', 'Rating', 'Link']
             writer = csv.writer(f, dialect='excel')
 
             writer.writerow(headers)
@@ -62,9 +63,14 @@ class Distro_Watch:
 
             extracted_data = []
             for distro in content['distributions']:
-                extracted_data.append([distro['rank'], distro['name'], distro['rating']])
+                extracted_data.append([distro['rank'], distro['name'], distro['rating'], distro['url']])
 
             writer.writerows(extracted_data)
+
+        df = pd.read_csv(os.path.join(os.getcwd(), f'{span_name}.csv'), index_col=0)
+        pd.set_option('display.max_rows', None)
+        df.drop(['Link'], axis=1, inplace=True)
+        print(df)
 
     def get_ranks(self, dataspan_value):
         distro_dict = {'info': [], 'distributions': []}
