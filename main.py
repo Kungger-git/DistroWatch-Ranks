@@ -1,9 +1,11 @@
 #! /usr/bin/env python3
 
 import requests
+import os
 import csv
 import json
 import colorama
+from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from colorama import Fore, Style
 from bs4 import BeautifulSoup as soup
 
@@ -85,5 +87,23 @@ class Distro_Watch:
 
 if __name__ == '__main__':
     colorama.init()
-    Distro_Watch(Scrape_Site(
-        'https://distrowatch.com/').make_request()).ranks()
+    
+    parser = ArgumentParser(formatter_class=RawDescriptionHelpFormatter,
+                            description="View Linux Distribution Ranks")
+
+    parser.add_argument('--delete-ranks',
+                        action='store_true',
+                        help='deletes csv files that are just clutter.')
+    
+    args = parser.parse_args()
+    if args.delete_ranks:
+        deleted = []
+        for file in os.listdir():
+            if file.endswith('.csv'):
+                deleted.append(file)
+                os.remove(file)
+                print(f'Removed: {file}')
+        if deleted == []:
+            print('There is nothing to delete')
+    else:
+        Distro_Watch(Scrape_Site('https://distrowatch.com/').make_request()).ranks()
